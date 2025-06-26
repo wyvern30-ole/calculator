@@ -1,4 +1,6 @@
 import javax.swing.*;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -33,6 +35,7 @@ public class Calculator implements ActionListener {
 	private String currentText = "";
 	private String prevAns = "0"; // previous answer so user doesn't have to manually type it again
 	Font font = new Font("Monospaced", Font.BOLD, 30); // font for all text
+	boolean justAnswered = false; // used for updating the prevAns field once user begins new equation
 
 	/**
 	 * Creates Calculator object, which will look/act like a handheld calculator
@@ -76,7 +79,7 @@ public class Calculator implements ActionListener {
 		// operators
 		addB = new JButton("+");
 		subtractB = new JButton("-");
-		multiplyB = new JButton("x");
+		multiplyB = new JButton("*");
 		divideB = new JButton("/");
 		powerB = new JButton("^");
 		rootB = new JButton("√");
@@ -208,6 +211,14 @@ public class Calculator implements ActionListener {
 	 */
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		// update previous answer once user begins new equation
+		if (justAnswered) {
+			prevAns = currentText;
+			prevText.setText(prevAns);
+			textfield.setText("");
+			justAnswered = false;
+		}
+
 		// clear button is pressed
 		if (e.getSource() == extraFunctionB[0]) {
 			textfield.setText("");
@@ -226,16 +237,16 @@ public class Calculator implements ActionListener {
 			textfield.replaceSelection(((JButton) e.getSource()).getText());
 		}
 		// equals button is pressed
-		else if (e.getSource() == extraArithB[3]) {
-			// TODO
-		}
-
-		// number button is pressed
 		else {
-			for (int i = 0; i < 10; i++) {
-				if (e.getSource() == numB[i]) {
-					textfield.replaceSelection(String.valueOf(i));
-				}
+			try {
+				// evaluate expression
+				Expression equation = new ExpressionBuilder((textfield.getText()).replace("√", "sqrt")).build();
+				String answer = String.valueOf(equation.evaluate());
+				// update fields
+				textfield.setText(answer);
+				justAnswered = true;
+			} catch (Exception ex) {
+				textfield.setText("ERROR");
 			}
 		}
 
