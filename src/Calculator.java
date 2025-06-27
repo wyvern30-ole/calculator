@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import net.objecthunter.exp4j.Expression;
 import net.objecthunter.exp4j.ExpressionBuilder;
 import java.awt.*;
@@ -9,7 +10,6 @@ import java.awt.event.*;
  * Any variable ending with B means it's a button
  */
 public class Calculator implements ActionListener {
-
 	// ui
 	JFrame frame;
 	JPanel panel;
@@ -42,7 +42,7 @@ public class Calculator implements ActionListener {
 	 */
 	public Calculator() {
 		// creating frame
-		frame = new JFrame("Calculator");
+		frame = new JFrame("~ Calculator ~");
 
 		// setting up frame
 		frame.setSize(400, 500);
@@ -52,10 +52,13 @@ public class Calculator implements ActionListener {
 
 		// setting up panel and grid
 		panel = new JPanel(new GridBagLayout());
+		panel.setBackground(new Color(178, 252, 229));
 		// setting up constraints
 		constraints = new GridBagConstraints();
 		constraints.insets = new Insets(5, 5, 5, 5); // space around components
 		constraints.fill = GridBagConstraints.BOTH; // stretch to fill cell
+		constraints.weightx = 1; // extra space
+		constraints.weighty = 1; // extra space
 
 		// making main textfield
 		textfield = new JTextField();
@@ -198,6 +201,27 @@ public class Calculator implements ActionListener {
 	 * @param item  - button to add
 	 */
 	public void addItem(int x, int y, JButton item) {
+		// design
+		item.setContentAreaFilled(false);
+		item.setFocusPainted(false);
+		item.setOpaque(true);
+
+		item.setForeground(new Color(122, 244, 253)); // text
+		item.setBackground(new Color(21, 134, 138)); // button color
+		item.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				item.setBackground(new Color(9, 77, 80)); // button color when pressed
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				item.setBackground(new Color(21, 134, 138)); // button color when released
+			}
+		});
+		item.setBorder(new LineBorder(new Color(15, 76, 78), 3, true));
+
+		// placement
 		constraints.gridx = x;
 		constraints.gridy = y;
 		panel.add(item, constraints);
@@ -229,7 +253,9 @@ public class Calculator implements ActionListener {
 		}
 		// delete button is pressed
 		else if (e.getSource() == extraFunctionB[2]) {
-			textfield.setText(currentText.substring(0, currentText.length() - 1));
+			if (!textfield.getText().equals("")) { // throws error if not checked
+				textfield.setText(currentText.substring(0, currentText.length() - 1));
+			}
 		}
 
 		// arithmetic/symbol button is pressed
